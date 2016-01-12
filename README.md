@@ -104,6 +104,7 @@ data
 {
   moduleName: 'testApp',
   name: 'example',
+  path: 'app/example',
   fields:[ 
     { 
       name: 'name',

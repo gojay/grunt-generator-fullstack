@@ -20,6 +20,7 @@ function Generator(options) {
   }
   this.options.name = options.args.shift();
   this.options.className = _.capitalize(_.camelCase(this.options.name));
+  this.options.path = 'app/'+ this.options.name;
   // build fields
   this.options.fields = this.buildFields();
 };
