@@ -90,7 +90,7 @@ grunt.registerTask('generator', function (target, options) {
 
 #### Create generator templates
 
-[sample generator templates](https://github.com/smaxtastic/grunt-typographic-adoption/tree/master/generator)
+[sample generator templates](https://github.com/gojay/grunt-generator-fullstack/tree/master/generator)
 
 ## Run
 
