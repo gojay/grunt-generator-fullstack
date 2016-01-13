@@ -1,6 +1,5 @@
 table.table.table-striped.table-responsive
-	tbody
-<% if(fields) { _.forEach(fields, function(field) { %>
+	tbody<% if(fields) { _.forEach(fields, function(field) { %>
 		tr
 			th <%= field.title %>
 			td(ng-bind="model.<%= field.name %>")

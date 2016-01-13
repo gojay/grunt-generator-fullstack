@@ -36,14 +36,14 @@ module.exports = function(grunt) {
       default: {
         options: {
           moduleName: 'testApp',
-          routes: {
-            file: 'server/routes.js',
-            pattern: '// Insert routes below'
-          }
+          // routes: {
+          //   file: 'server/routes.js',
+          //   pattern: '// Insert routes below'
+          // }
         },
         files: {
-          'client/app': ['generator/client/app/**'],
-          'client/components': ['generator/client/components/**'],
+          // 'client/app': ['generator/client/app/**'],
+          // 'client/components': ['generator/client/components/**'],
           'server/api': ['generator/server/api/**']
         }
       }
@@ -72,6 +72,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint', 'generator_fullstack']);
 
   // grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea
+  // grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea:name=date,type=date:name=active,type=boolean:name=direction,type=select,input=select,options=up/bottom/right/left --html
   grunt.registerTask('generator', function (target, options) {
     var args = Array.prototype.slice.call(arguments);
 

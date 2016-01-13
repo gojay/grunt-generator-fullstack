@@ -124,7 +124,6 @@ exports.destroy = function(req, res) {
 
 exports.search = function(req, res) {
   var filter = req.body.q ? { name: new RegExp(req.body.q, 'i') } : {} ;
-  filter.active = true;
   <%= className %>.find(filter).exec()
     .then(responseWithResult(res))
     .then(null, handleError(res));

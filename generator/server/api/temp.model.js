@@ -5,16 +5,12 @@ var Schema = mongoose.Schema;
 var Q = require('q');
 
 var <%= className %>Schema = new Schema({
-    <% if(fields) { _.forEach(fields, function(field) { %>
-    <%= field.name %>: <% if(field.required === 'true') { %>{ type: <%= field.type %>, required: true }<%} else {%><%= field.type %><%}%>,
-    <% }) } else { %>
+<% if(fields) { _.forEach(fields, function(field) { %>
+    <%= field.name %>: <%= field.modelObj %>,
+<% }) } else { %>
     name: String,
     info: String,
     <% } %>
-    active: {
-        type: Boolean,
-        default: true
-    },
     created: {
         type: Date,
         default: Date.now

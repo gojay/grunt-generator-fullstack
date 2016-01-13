@@ -13,6 +13,9 @@ var _ = require('lodash');
 var gruntTextReplace = require('../lib/grunt-text-replace');
 
 function Generator(options) {
+  this.typeData = ['string', 'number', 'date', 'boolean'];
+  this.errors = [];
+
   this.options = options;
   if(!options.args || !_.isArray(options.args)) {
     grunt.log.warn('options args undefined or not an Array!');
@@ -23,43 +26,89 @@ function Generator(options) {
   this.options.path = 'app/'+ this.options.name;
   // build fields
   this.options.fields = this.buildFields();
+  var dateField = _.find(this.options.fields, 'type', 'Date');
+  this.options.hasDate = dateField ? dateField.name : null ;
+  var selectField = _.find(this.options.fields, 'input', 'select');
+  this.options.selectOptions = selectField ? selectField.options : [] ;
 };
 
 Generator.prototype.buildFields = function (dest, files) {
-  return _.map(this.options.args, function(field) {
+  var self = this;
+  var fields = this.options.args.filter(function (field) {
+    if(/type=select/.test(field) && !/options/.test(field)) {
+      self.errors.push({
+        str: field,
+        message: 'options (separated by \'/\') required for SELECT!'
+      });
+      return false;
+    }
+    return true;
+  }).map(function (field) {
     field = field.toLowerCase();
     if(!/type=/.test(field)) {
       field += ',type=string';
-    }
+    } 
     return field.split(',').reduce(function(obj, item) {
       var split = item.split('=');
       var key = split[0];
       var value = split[1];
-      if(key == 'name') {
-        obj[key] = value;
-        obj['title'] = _.startCase(value);
-      }
-      else if(key == 'type') {
-        var type = ['string', 'number'].indexOf(value) > -1 ? value : 'String';
-        obj['type'] = _.startCase(type);
-        switch(type) {
-          case 'number':
-            obj['input'] = 'number';
-            break;
-          default:
-          case 'string':
-            if(!obj.hasOwnProperty('input')) {
-              obj['input'] = 'text';
+
+      switch(key) {
+        case 'name':
+          obj[key] = value;
+          obj['title'] = _.startCase(value);
+          break;
+        case 'type':
+          var type = self.typeData.indexOf(value) > -1 ? value : 'String';
+          obj['type'] = obj.model.type = _.startCase(type);
+          switch(type) {
+            case 'number':
+              obj['input'] = 'number';
+              break;
+            case 'date':
+              obj['input'] = 'date';
+              break;
+            case 'boolean':
+              obj['input'] = 'radio';
+              obj['options'] = [{
+                title: 'Yes',
+                value: true
+              }, {
+                title: 'No',
+                value: true
+              }];
+              break;
+            default:
+            case 'string':
+              if(!obj.hasOwnProperty('input')) {
+                obj['input'] = 'text';
+              }
+              break;
+          }
+          break;
+        case 'options':
+          obj.model.enum = value.split('/');
+          obj[key] = value.split('/').map(function(v) {
+            return {
+              title: _.startCase(v),
+              value: v
             }
-            break;
-        }
-      } 
-      else {
-        obj[key] = value;
+          });
+          break;
+        default:
+          obj[key] = value;
+          break;
       }
+
+      if(obj.required === 'true') {
+        obj.model['required'] = true;
+      }
+
+      obj.modelObj = JSON.stringify(obj.model).replace(/\"([^(\")"]+)\":/g,"$1:");
       return obj;
-    }, {});
+    }, { model: {} });
   });
+  return fields;
 };
 Generator.prototype.buildFiles = function (dest, files) {
   var prefix = 'generator/'+ dest;
@@ -97,7 +146,14 @@ module.exports = function(grunt) {
     });
 
     var g = new Generator(options);
-    grunt.log.writeln('options', g.options);
+    grunt.log.writeln('options', JSON.stringify(g.options, null, 2));
+
+    if(g.errors.length) {
+      g.errors.forEach(function (e) {
+        grunt.log.warn(e.message);
+      });
+      return false;
+    }
 
     // routes.js
     if(g.options.routes) {
@@ -152,10 +208,9 @@ module.exports = function(grunt) {
 
       if (!src.length) {
         grunt.log.warn(
-          'Destination `' + file.dest +
+          'Destination `' + f.dest +
           '` not written because `src` files were empty.'
         );
-        return;
       }
 
       var files = g.buildFiles(f.dest, src);
