@@ -1,0 +1,24 @@
+.row
+	.col-md-12
+		table.table-striped.table-responsive.table-hover(ng-table="vm.table", show-filter="false")
+			tbody(ng-repeat="model in $data")
+				tr
+<% if(fields) { _.forEach(fields, function(field) { %>
+					td(data-title="'<%= field.title %>'")
+						strong(ng-bind="model.<%= field.name %>")
+<% }) } else { %>
+					td(data-title="'Name'")
+						strong(ng-bind="model.name")
+					td(data-title="'Info'")
+						strong(ng-bind="model.info")
+<% } %>
+					td.align-center(data-title="'Created'", sortable="'created'")
+						span {{ model.created | amDateFormat:'MM/DD/YYYY HH:mm:ss' }}
+					td.align-right
+						span.btn-group
+							button.btn.btn-sm.btn-default(ng-click="vm.open(model.name, model)")
+								i.fa.fa-eye
+							button.btn.btn-sm.btn-info(ng-click="vm.edit(model._id)")
+								i.fa.fa-pencil
+							button.btn.btn-sm.btn-danger(ng-click="vm.deleteConfirm(model.name, model)")
+								i.fa.fa-eye

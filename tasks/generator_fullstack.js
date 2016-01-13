@@ -83,12 +83,21 @@ module.exports = function(grunt) {
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
 
+  var extensions = {
+    jade: ['css', 'js', 'jade'],
+    html: ['css', 'js', 'html']
+  };
+
   grunt.registerMultiTask('generator_fullstack', 'Generator crud templates for angular-fullstack', function() {
     // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options();
+    
+    // default, jade template
+    var options = this.options({
+      jade: grunt.option('html') === true ? false : true
+    });
 
     var g = new Generator(options);
-    // grunt.log.writeln('options', g.options);
+    grunt.log.writeln('options', g.options);
 
     // routes.js
     if(g.options.routes) {
@@ -129,8 +138,16 @@ module.exports = function(grunt) {
         } else {
           return true;
         }
-      }).filter(function(filepath) {
+      })
+      // filter is file
+      .filter(function(filepath) {
         return grunt.file.isFile(filepath);
+      })
+      // filter jade/html
+      .filter(function(filepath) {
+        var ext = options.jade ? extensions.jade : extensions.html;
+        var regexExt = new RegExp('.('+ ext.join("|") +')$', 'i');
+        return regexExt.test(filepath);
       });
 
       if (!src.length) {

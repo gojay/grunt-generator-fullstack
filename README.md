@@ -1,6 +1,6 @@
 # grunt-generator-fullstack
 
-> Generator crud templates for angular-fullstack
+> Generate crud templates for angular-fullstack
 
 ## Getting Started
 This plugin requires Grunt `~0.4.5`
@@ -47,7 +47,6 @@ Type: `Object`
 
 Your fullstack routes file & pattern
 
-
 ### Usage Examples
 
 #### Gruntfile.js
@@ -61,7 +60,8 @@ grunt.initConfig({
         routes: {
           file: 'server/routes.js',
           pattern: '// Insert routes below'
-        }
+        },
+        jade: false // use html template
       },
       files: {
         'client/app': ['generator/client/app/**'],
@@ -83,28 +83,39 @@ grunt.registerTask('generator', function (target, options) {
       }
     }
   });
-  grunt.task.run(['clean', 'generator_fullstack']);
+  grunt.task.run(['generator_fullstack']);
 });
 
 ```
 
-#### Create generator templates
+#### Create templates
 
 [sample generator templates](https://github.com/gojay/grunt-generator-fullstack/tree/master/generator)
 
 ## Run
 
+By default use jade template
+
 ```js
 grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea
 ```
 
-data
+Use html template
+
+```js
+grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea --html
+```
+
+
+template data:
 
 ```js
 {
   moduleName: 'testApp',
   name: 'example',
+  className: 'Example',
   path: 'app/example',
+  jade: false,
   fields:[ 
     { 
       name: 'name',
@@ -127,6 +138,41 @@ data
     } 
   ]
 }
+```
+
+Details:
+
+
+```js
+url: /clients
+client 
+  index ngTable
+  form
+     - name: name
+       required: true
+       input type: text (default)
+     - name: price
+       required: true
+       input type: number
+     - name: description
+       input type: textarea
+server    
+  model:
+     - name: name
+       required: true
+       type: String (default)
+     - name: price
+       type: Number
+       required: true
+     - name: description
+       type: String (default)
+  api: 
+     GET /api/examples
+     GET /api/examples/:id
+     POST /api/examples
+     PUT /api/examples/:id
+     DELETE /api/examples/:id
+
 ```
 
 

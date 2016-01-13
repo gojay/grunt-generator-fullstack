@@ -1,0 +1,14 @@
+table.table.table-striped.table-responsive
+	tbody
+<% if(fields) { _.forEach(fields, function(field) { %>
+		tr
+			th <%= field.title %>
+			td(ng-bind="model.<%= field.name %>")
+<% }) } else { %>
+		tr
+			th Name
+			td(ng-bind="model.name")
+		tr
+			th Info
+			td(ng-bind="model.info")
+<% } %>
