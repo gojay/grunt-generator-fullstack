@@ -165,7 +165,7 @@ module.exports = function(grunt) {
     });
 
     var g = new Generator(options);
-    grunt.log.writeln('options', JSON.stringify(g.options, null, 2));
+    // grunt.log.writeln('options', JSON.stringify(g.options, null, 2));
 
     if(g.errors.length) {
       g.errors.forEach(function (e) {
@@ -238,7 +238,7 @@ module.exports = function(grunt) {
         var template = grunt.file.read(src);
         var result = grunt.template.process(template, { data: g.options });
         // Write the destination file
-        // grunt.file.write(dest, result);
+        grunt.file.write(dest, result);
         // Print a success message
         grunt.log.writeln('File `' + dest + '` created.');
       });
