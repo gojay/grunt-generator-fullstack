@@ -64,9 +64,15 @@ Generator.prototype.buildFields = function (dest, files) {
           switch(type) {
             case 'number':
               obj['input'] = 'number';
+              // obj.test.post = [obj.name, 10];
+              // obj.test.put = [obj.name, 20];
               break;
             case 'date':
               obj['input'] = 'date';
+              // obj.test.post = [obj.name, new Date()];
+              // var tomorrow = new Date();
+              // tomorrow.setDate(tomorrow.getDate() + 1);
+              // obj.test.put = [obj.name, tomorrow];
               break;
             case 'boolean':
               obj['input'] = 'radio';
@@ -75,14 +81,18 @@ Generator.prototype.buildFields = function (dest, files) {
                 value: true
               }, {
                 title: 'No',
-                value: true
+                value: false
               }];
+              // obj.test.post = [obj.name, true];
+              // obj.test.put = [obj.name, false];
               break;
             default:
             case 'string':
               if(!obj.hasOwnProperty('input')) {
                 obj['input'] = 'text';
               }
+              // obj.test.post = [obj.name, 'new '+ obj.name];
+              // obj.test.put = [obj.name, 'updated '+ obj.name];
               break;
           }
           break;
@@ -103,10 +113,18 @@ Generator.prototype.buildFields = function (dest, files) {
       if(obj.required === 'true') {
         obj.model['required'] = true;
       }
+      if(obj.default) {
+        if(obj.default === 'true') 
+          obj.default = true;
+        else if(obj.default === 'false') 
+          obj.default = false;
 
-      obj.modelObj = JSON.stringify(obj.model).replace(/\"([^(\")"]+)\":/g,"$1:");
+        obj.model['default'] = obj.default;
+      }
+
+      obj.schemaType = JSON.stringify(obj.model).replace(/\"([^(\")"]+)\":/g,"$1:");
       return obj;
-    }, { model: {} });
+    }, { model: {}/*, test: { post: [], put: [] }*/ });
   });
   return fields;
 };
@@ -115,7 +133,7 @@ Generator.prototype.buildFiles = function (dest, files) {
   var replaceObj = {
     temp: this.options.name
   };
-  replaceObj[prefix] = dest + '/' + this.options.name;
+  replaceObj[prefix] = this.options.unprefixDest.indexOf(dest) > -1 ? dest : dest + '/' + this.options.name;
 
   return _.reduce(files, function (obj, file) {
     var regex = new RegExp(prefix+'|temp', 'gi');
@@ -142,6 +160,7 @@ module.exports = function(grunt) {
     
     // default, jade template
     var options = this.options({
+      unprefixDest: [],
       jade: grunt.option('html') === true ? false : true
     });
 
@@ -219,7 +238,7 @@ module.exports = function(grunt) {
         var template = grunt.file.read(src);
         var result = grunt.template.process(template, { data: g.options });
         // Write the destination file
-        grunt.file.write(dest, result);
+        // grunt.file.write(dest, result);
         // Print a success message
         grunt.log.writeln('File `' + dest + '` created.');
       });

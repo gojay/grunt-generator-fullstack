@@ -6,7 +6,7 @@ var Q = require('q');
 
 var <%= className %>Schema = new Schema({
 <% if(fields) { _.forEach(fields, function(field) { %>
-    <%= field.name %>: <%= field.modelObj %>,
+    <%= field.name %>: <%= field.schemaType %>,
 <% }) } else { %>
     name: String,
     info: String,

@@ -39,12 +39,15 @@ module.exports = function(grunt) {
           // routes: {
           //   file: 'server/routes.js',
           //   pattern: '// Insert routes below'
-          // }
+          // },
+          unprefixDest: ['client/templates', 'server/components']
         },
         files: {
-          // 'client/app': ['generator/client/app/**'],
-          // 'client/components': ['generator/client/components/**'],
-          'server/api': ['generator/server/api/**']
+          'client/app': ['generator/client/app/**'],
+          'client/components': ['generator/client/components/**'],
+          // 'client/templates': ['generator/client/templates/**'],
+          'server/api': ['generator/server/api/**'],
+          'server/components': ['generator/server/components/**']
         }
       }
     },
@@ -71,8 +74,21 @@ module.exports = function(grunt) {
   // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'generator_fullstack']);
 
-  // grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea
-  // grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea:name=date,type=date:name=active,type=boolean:name=direction,type=select,input=select,options=up/bottom/right/left --html
+  /**
+   * grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea
+   * grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea:name=date,type=date:name=active,type=boolean,default=true:name=direction,type=select,input=select,options=up/bottom/right/left --html
+   *
+   * or
+   * 
+    grunt generator:example\
+    :name=name,required=true\
+    :name=price,type=number,required=true\
+    :name=description,input=textarea\
+    :name=date,type=date\
+    :name=active,type=boolean,default=true\
+    :name=direction,type=select,input=select,options=up/bottom/right/left
+   *
+   */
   grunt.registerTask('generator', function (target, options) {
     var args = Array.prototype.slice.call(arguments);
 

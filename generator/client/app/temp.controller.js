@@ -3,9 +3,9 @@
 angular.module('<%= moduleName %>')
     .controller('<%= className %>Ctrl', <%= className %>Ctrl);
 
-<%= className %>Ctrl.$inject = ['$scope', '$state', 'ngTableParams', 'Modal', '<%= className %>', 'logger', 'utils'];
+<%= className %>Ctrl.$inject = ['$scope', '$state', 'ngTableParams', 'Modal', '<%= className %>', '$log', 'utils'];
 
-function <%= className %>Ctrl($scope, $state, ngTableParams, Modal, <%= className %>, logger, utils) {
+function <%= className %>Ctrl($scope, $state, ngTableParams, Modal, <%= className %>, $log, utils) {
     var vm = this;
     vm.<%= name %>s = [];
 
@@ -18,10 +18,10 @@ function <%= className %>Ctrl($scope, $state, ngTableParams, Modal, <%= classNam
 
     vm.deleteConfirm = Modal.confirm.delete(function(<%= name %>) {
         <%= name %>.$remove(function() {
-            logger.success('Success!', 'Delete <%= name %>');
+            $log.info('Success!', 'Delete <%= name %>');
             vm.table.reload();
         }, function(err) {
-            logger.error('Error occured!', 'Delete <%= name %>', err);
+            $log.error('Error occured!', 'Delete <%= name %>', err);
         });
     });
 
@@ -46,7 +46,7 @@ function <%= className %>Ctrl($scope, $state, ngTableParams, Modal, <%= classNam
             vm.table.total(headers('X-Pagination-Total-Count'));
             vm.loading = true;
         }, function(err) {
-            logger.error('Error occured!', 'Load <%= name %>s', err);
+            $log.error('Error occured!', 'Load <%= name %>s', err);
             vm.loading = true;
         });
     }
