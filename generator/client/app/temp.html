@@ -2,10 +2,10 @@
   <div class="col-md-12">
     <table class="table table-striped table-responsive table-hover" ng-table="vm.table" show-filter="false">
       <tbody ng-repeat="model in $data">
-        <tr>
+        <tr class="align-center">
 <% if(fields) { _.forEach(fields, function(field) { %>
           <td data-title="'<%= field.title %>'">
-            <strong ng-bind="model.<%= field.name %>"></strong>
+            <strong ng-bind="model.<%= field.name %><%= (field.type == 'Date') ? ' | amDateFormat:\'MM/DD/YYYY\'' : '' %>"></strong>
           </td>
 <% }) } else { %>
           <td data-title="'<%= className %>'">

@@ -1,0 +1,26 @@
+<form name="Form" novalidate class="no-margin" ng-submit="upload(Form)">
+  <div class="modal-header">
+    <h4 class="modal-title">Upload</h4>
+  </div>
+  <fieldset ng-disabled="submitted">
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="" class="control-label">Url</label>
+        <input type="url" name="url" class="form-control" autocomplete="off" ng-model="model.url">
+        <span class="text-danger" ng-show="Form.url.$error.url">Invalid Url.</span>
+      </div>
+      <!-- <div class="form-group">
+        <label for="" class="control-label">File</label>
+        <input type="text" class="form-control">
+      </div> -->
+    </div>
+  </fieldset>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-link" ng-click="$close('cancel')" ng-disabled="submitted">
+      Cancel
+    </button>
+    <button type="submit" class="btn btn-primary" ng-disabled="submitted">
+      {{submitted ? 'Uploading...': 'Upload'}}
+    </button>
+  </div>
+</form>

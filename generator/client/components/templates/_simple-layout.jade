@@ -1,0 +1,8 @@
+header.header.navbar.navbar-fixed-top(role='banner', ng-include="'components/templates/_header.html'")
+#container.fixed-header(ng-class="{ 'sidebar-closed': !app.showSidebar }")
+  #sidebar.sidebar-fixed(ng-include="'components/templates/_sidebar.html'", ng-show='app.showSidebar')
+  #content
+    .container
+      .crumbs
+        div(ncy-breadcrumb='')
+      div(ui-view='')

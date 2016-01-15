@@ -1,0 +1,27 @@
+#sidebar-content
+  ul#nav
+    li(ui-sref-active='current')
+      a(ui-sref='dashboard')
+        i.fa.fa-dashboard
+        |         Dashboard
+    li(ui-sref-active='current', ng-if="app.isAdmin('m')")
+      a(ui-sref='material.index')
+        i.fa.fa-tablet
+        |         Material
+    li(ui-sref-active='current', ng-if="app.isAdmin('p')")
+      a(ui-sref='product.index')
+        i.fa.fa-tablet
+        |         Product
+    li(ui-sref-active='current', ng-if="app.isAdmin('co')")
+      a(ui-sref='order.index')
+        i.fa.fa-ticket
+        |         Orders
+    li(ui-sref-active='current', ng-if="app.isAdmin('co')")
+      a(ui-sref='customer.index')
+        i.fa.fa-group
+        |         Customers
+    li(ui-sref-active='current', ng-if='app.isRoot()')
+      a(ui-sref='user.index')
+        i.fa.fa-group
+        |         Users
+#divider

@@ -1,0 +1,36 @@
+<header class="header navbar navbar-fixed-top" role="banner" ng-include="'components/templates/_header.html'"></header>
+<div id="container" class="fixed-header" ng-class="{ 'sidebar-closed': !app.showSidebar }">
+  <div id="sidebar" class="sidebar-fixed" ng-include="'components/templates/_sidebar.html'" ng-show="app.showSidebar"></div>
+  <div id="content">
+    <div class="container">
+      <div class="crumbs">
+        <div ncy-breadcrumb></div>
+      </div>
+      <div class="page-stats text-right" ng-if="!app.$state.is('account.settings')">
+        <button type="button" class="btn btn-inverse" ng-click="app.$state.go('^.new')">
+          <i class="fa fa-plus"></i>
+          New
+        </button>
+      </div><!-- .page-stats -->
+      <div class="page-header">
+        <div class="page-title">
+          <h3 ng-bind="$state.current.data.title"></h3>
+        </div><!-- .page-title -->
+      </div><!-- .page-header -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="widget box">
+            <div class="widget-header" ng-switch="app.$state.current.url">
+              <h4 ng-switch-when="/:id/edit" ng-bind="'Edit #' + app.$state.params.id"></h4>
+              <h4 ng-switch-when="/:id" ng-bind="'#' + app.$state.params.id"></h4>
+              <h4 ng-switch-default ng-bind="app.$state.current.ncyBreadcrumbLabel"></h4>
+            </div><!-- .widget-header -->
+            <div class="widget-content" ng-class="{ 'no-padding': $state.current.url === '/:id'}">
+              <div ui-view></div>
+            </div><!-- .widget-content -->
+          </div><!-- .widget.box -->
+        </div><!-- .col-md-12 -->
+      </div><!-- .row -->
+    </div>
+  </div>
+</div>

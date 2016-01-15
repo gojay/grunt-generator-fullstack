@@ -1,0 +1,41 @@
+<div id="sidebar-content">
+  <ul id="nav">
+    <li ui-sref-active="current">
+      <a ui-sref="dashboard">
+        <i class="fa fa-dashboard"></i>
+        Dashboard
+      </a>
+    </li>
+    <li ui-sref-active="current" ng-if="app.isAdmin('m')">
+      <a ui-sref="material.index">
+        <i class="fa fa-tablet"></i>
+        Material
+      </a>
+    </li>
+    <li ui-sref-active="current" ng-if="app.isAdmin('p')">
+      <a ui-sref="product.index">
+        <i class="fa fa-tablet"></i>
+        Product
+      </a>
+    </li>
+    <li ui-sref-active="current" ng-if="app.isAdmin('co')">
+      <a ui-sref="order.index">
+        <i class="fa fa-ticket"></i>
+        Orders
+      </a>
+    </li>
+    <li ui-sref-active="current" ng-if="app.isAdmin('co')">
+      <a ui-sref="customer.index">
+        <i class="fa fa-group"></i>
+        Customers
+      </a>
+    </li>
+    <li ui-sref-active="current" ng-if="app.isRoot()">
+      <a ui-sref="user.index">
+        <i class="fa fa-group"></i>
+        Users
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="divider"></div>

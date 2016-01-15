@@ -1,0 +1,40 @@
+.row
+	.col-md-12
+		form.form-horizontal.row-border(name="form", ng-submit="vm.save(form)", accessible-form, novalidate)<% if(fields) { _.forEach(fields, function(field) { %>
+			.form-group(ng-class="vm.getFormClass(form.<%= field.name %>)")
+				label.col-md-3.control-label <%= field.title %>
+				.col-md-9<% if(field.input == 'textarea') { %>
+					textarea.form-control(name="<%= field.name %>", ng-model="vm.model.<%= field.name %>"<%= field.required === 'true' ? ', required': '' %>)<% } else if(field.input == 'date') { %>
+					p.input-group
+						input.form-control(type="text", name="<%= field.name %>", ng-model="vm.model.<%= field.name %>", datepicker-popup="{{vm.datepicker.format}}", datepicker-options="vm.datepicker.options", is-open="vm.datepicker.opened", min-date="vm.datepicker.minDate", date-disabled="vm.datepicker.disabled(date, mode)", close-text="Close")
+						.input-group-btn
+							button.btn.btn-default(type="button", ng-click="vm.datepicker.open($event)")
+								i.glyphicon.glyphicon-calendar<% } else if(field.input == 'select') { %>
+					select.form-control(name="<%= field.name %>", ng-model="vm.model.<%= field.name %>", ng-options="o.value as o.title for o in vm.options"<%= field.required === 'true' ? ', required': '' %>)<% } else if(field.input == 'radio') { %>
+					.btn-group<% _.forEach(field.options, function(option) { %>
+						label.btn.btn-info(ng-model="vm.model.<%= field.name %>", btn-radio="<%= option.value %>", uncheckable) <%= option.title %></label><% }) %>
+						input(type="hidden", name="<%= field.name %>", ng-model="vm.model.<%= field.name %>"<%= field.required === 'true' ? ' required': '' %>)<% } else { %>
+					input.form-control(type="<%= field.input %>", name="<%= field.name %>", ng-model="vm.model.<%= field.name %>", autocomplete="off"<%= field.required === 'true' ? ', required': '' %>)<% } %>
+				.col-md-9.col-md-push-3(ng-if="vm.isInteracted(form.<%= field.name %>)", ng-messages="form.<%= field.name %>.$error")
+					div(ng-messages-include="components/templates/_ng-messages.html")
+<% }) } else { %>
+			.form-group(ng-class='vm.getFormClass(form.name)')
+				label.col-md-3.control-label Name
+				.col-md-9
+					input.form-control(type='text', name='name', autocomplete='off', ng-model='vm.model.name', required='')
+				.col-md-9.col-md-push-3(ng-if='vm.isInteracted(form.name)', ng-messages='form.name.$error')
+					div(ng-messages-include='components/templates/_ng-messages.html')
+			.form-group(ng-class='vm.getFormClass(form.info)')
+				label.col-md-3.control-label Info
+				.col-md-9
+					input.form-control(type='text', name='name', autocomplete='off', ng-model='vm.model.info', required='')
+				.col-md-9.col-md-push-3(ng-if='vm.isInteracted(form.info)', ng-messages='form.info.$error')
+					div(ng-messages-include='components/templates/_ng-messages.html')
+<% } %>
+			.form-group
+				.col-md-offset-3.col-md-9
+					button.btn.btn-primary.btn-lg(type='submit', ng-disabled='vm.loading || form.$pristine')
+						span(ng-if='vm.loading')
+							i.fa.fa-circle-o-notch.fa-spin
+							|  Saving..
+						span(ng-if='!vm.loading') Save

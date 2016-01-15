@@ -1,0 +1,28 @@
+.container
+  ul.nav.navbar-nav
+    li.nav-toggle
+      a(href='javascript:void(0);', title='')
+        i.fa.fa-bars
+  a.navbar-brand(href='/')
+    <%= className %>
+  a.toggle-sidebar(role='button', tooltip='Toggle navigation', tooltip-placement='bottom', ng-click='app.showSidebar = !app.showSidebar')
+    i.fa.fa-bars
+  ul.nav.navbar-nav.navbar-left
+    li.dropdown
+      ul.dropdown-menu
+  ul.nav.navbar-nav.navbar-right
+    // User Login Dropdown
+    li.dropdown.user
+      a.dropdown-toggle(href='#')
+        i.fa.fa-user
+        span.username {{app.getCurrentUser().name}}
+        i.fa.fa-caret-down.small
+      ul.dropdown-menu
+        li(ui-sref-active='active')
+          a(ui-sref='account.settings')
+            | Change password
+        li.divider
+        li
+          a(href='javascript:void(0)', ng-click='app.signOut()')
+            i.fa.fa-key
+            | Sign out

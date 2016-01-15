@@ -1,10 +1,10 @@
 .row
 	.col-md-12
-		table.table-striped.table-responsive.table-hover(ng-table="vm.table", show-filter="false")
+		table.table.table-striped.table-responsive.table-hover(ng-table="vm.table", show-filter="false")
 			tbody(ng-repeat="model in $data")
-				tr<% if(fields) { _.forEach(fields, function(field) { %>
+				tr.align-center<% if(fields) { _.forEach(fields, function(field) { %>
 					td(data-title="'<%= field.title %>'")
-						strong(ng-bind="model.<%= field.name %>")
+						strong(ng-bind="model.<%= field.name %><%= (field.type == 'Date') ? ' | amDateFormat:\'MM/DD/YYYY\'' : '' %>")
 <% }) } else { %>
 					td(data-title="'Name'")
 						strong(ng-bind="model.name")

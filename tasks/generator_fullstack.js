@@ -161,7 +161,8 @@ module.exports = function(grunt) {
     // default, jade template
     var options = this.options({
       unprefixDest: [],
-      jade: grunt.option('html') === true ? false : true
+      jade: grunt.option('html') === true ? false : true,
+      skip: []
     });
 
     var g = new Generator(options);
@@ -216,7 +217,7 @@ module.exports = function(grunt) {
       })
       // filter is file
       .filter(function(filepath) {
-        return grunt.file.isFile(filepath);
+        return grunt.file.isFile(filepath) && options.skip.indexOf(f.dest) == -1;
       })
       // filter jade/html
       .filter(function(filepath) {
@@ -225,10 +226,12 @@ module.exports = function(grunt) {
         return regexExt.test(filepath);
       });
 
+      // console.log(f.dest, JSON.stringify(src, null, 2));
+
       if (!src.length) {
         grunt.log.warn(
           'Destination `' + f.dest +
-          '` not written because `src` files were empty.'
+          '` not written because `src` files were empty or skipped.'
         );
       }
 

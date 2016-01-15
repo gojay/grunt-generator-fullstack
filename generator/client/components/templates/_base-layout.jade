@@ -1,0 +1,23 @@
+header.header.navbar.navbar-fixed-top(role='banner', ng-include="'components/templates/_header.html'")
+#container.fixed-header(ng-class="{ 'sidebar-closed': !app.showSidebar }")
+  #sidebar.sidebar-fixed(ng-include="'components/templates/_sidebar.html'", ng-show='app.showSidebar')
+  #content
+    .container
+      .crumbs
+        div(ncy-breadcrumb='')
+      .page-stats.text-right(ng-if="!app.$state.is('account.settings')")
+        button.btn.btn-inverse(type='button', ng-click="app.$state.go('^.new')")
+          i.fa.fa-plus
+          | New
+      .page-header
+        .page-title
+          h3(ng-bind='$state.current.data.title')
+      .row
+        .col-md-12
+          .widget.box
+            .widget-header(ng-switch='app.$state.current.url')
+              h4(ng-switch-when='/:id/edit', ng-bind="'Edit #' + app.$state.params.id")
+              h4(ng-switch-when='/:id', ng-bind="'#' + app.$state.params.id")
+              h4(ng-switch-default='', ng-bind='app.$state.current.ncyBreadcrumbLabel')
+            .widget-content(ng-class="{ 'no-padding': $state.current.url === '/:id'}")
+              div(ui-view='')

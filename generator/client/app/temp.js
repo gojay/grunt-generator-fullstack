@@ -6,7 +6,7 @@ angular.module('<%= moduleName %>')
       .state('<%= name %>', {
         url: '/<%= name %>s',
         abstract: true,
-        templateUrl: 'templates/_base-layout.html',
+        templateUrl: 'components/templates/_base-layout.html',
         ncyBreadcrumb: {
           parent: '<%= name %>.index'
         }
@@ -19,11 +19,12 @@ angular.module('<%= moduleName %>')
           ncyBreadcrumb: { 
             parent: 'dashboard',
             label: '<%= className %>'
-          }
+          },
+          authenticate: true
         })
         .state('<%= name %>.new', {
           url: '/new',
-          templateUrl: '<%= path %>/form/<%= name %>.form.html',
+          templateUrl: '<%= path %>/form/<%= name %>.html',
           controller: '<%= className %>FormCtrl',
           controllerAs: 'vm',
         	resolve: {
@@ -33,11 +34,12 @@ angular.module('<%= moduleName %>')
         	},
           ncyBreadcrumb: { 
             label: 'Create'
-          }
+          },
+          authenticate: true
         })
         .state('<%= name %>.edit', {
           url: '/:id/edit',
-          templateUrl: '<%= path %>/form/<%= name %>.form.html',
+          templateUrl: '<%= path %>/form/<%= name %>.html',
           controller: '<%= className %>FormCtrl',
           controllerAs: 'vm',
         	resolve: {
@@ -47,6 +49,7 @@ angular.module('<%= moduleName %>')
         	},
           ncyBreadcrumb: {
             label: 'Edit {{vm.<%= name %>.name}}'
-          }
+          },
+          authenticate: true
         });
   });

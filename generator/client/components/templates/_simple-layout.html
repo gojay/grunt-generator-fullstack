@@ -1,0 +1,12 @@
+<header class="header navbar navbar-fixed-top" role="banner" ng-include="'components/templates/_header.html'"></header>
+<div id="container" class="fixed-header" ng-class="{ 'sidebar-closed': !app.showSidebar }">
+  <div id="sidebar" class="sidebar-fixed" ng-include="'components/templates/_sidebar.html'" ng-show="app.showSidebar"></div>
+  <div id="content">
+  	<div class="container">
+      <div class="crumbs">
+        <div ncy-breadcrumb></div>
+      </div>
+      <div ui-view></div>
+  </div>
+  </div>
+</div>

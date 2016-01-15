@@ -40,11 +40,12 @@ module.exports = function(grunt) {
           //   file: 'server/routes.js',
           //   pattern: '// Insert routes below'
           // },
-          unprefixDest: ['client/templates', 'server/components']
+          unprefixDest: ['client/templates', 'client/components/templates', 'server/components']
         },
         files: {
           'client/app': ['generator/client/app/**'],
-          'client/components': ['generator/client/components/**'],
+          'client/components': ['generator/client/components/*'],
+          'client/components/templates': ['generator/client/components/templates/*'],
           // 'client/templates': ['generator/client/templates/**'],
           'server/api': ['generator/server/api/**'],
           'server/components': ['generator/server/components/**']
@@ -77,6 +78,7 @@ module.exports = function(grunt) {
   /**
    * grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea
    * grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea:name=date,type=date:name=active,type=boolean,default=true:name=direction,type=select,input=select,options=up/bottom/right/left --html
+   * grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=date,type=date:name=active,type=boolean,default=true:name=direction,type=select,input=select,required=true,options=up/bottom/right/left:name=description,input=textarea --html
    *
    * or
    * 
@@ -96,7 +98,8 @@ module.exports = function(grunt) {
       generator_fullstack: {
         default: {
           options: { 
-            args: args 
+            args: args ,
+            skip: ['server/components']
           }
         }
       }
