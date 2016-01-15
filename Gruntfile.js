@@ -45,8 +45,9 @@ module.exports = function(grunt) {
         files: {
           'client/app': ['generator/client/app/**'],
           'client/components': ['generator/client/components/*'],
-          'client/components/templates': ['generator/client/components/templates/*'],
-          // 'client/templates': ['generator/client/templates/**'],
+          // 'client/components/templates': ['generator/client/components/templates/**'],
+          // 'client/components/modal': ['generator/client/components/modal/**'],
+          // 'client/components/utils': ['generator/client/components/utils/**'],
           'server/api': ['generator/server/api/**'],
           'server/components': ['generator/server/components/**']
         }
@@ -98,8 +99,8 @@ module.exports = function(grunt) {
       generator_fullstack: {
         default: {
           options: { 
-            args: args ,
-            skip: ['server/components']
+            args: args,
+            skipDest: ['server/components']
           }
         }
       }

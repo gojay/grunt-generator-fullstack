@@ -9,19 +9,25 @@ function <%= className %>Resource($resource) {
 	var resource = $resource('/api/<%= name %>s/:id/:controller', {
       id: '@_id'
     }, {
-    	query: {
+        query: {
             method: 'GET',
             isArray: true
         },
-        search: {
+    	getBasic: {
             method: 'GET',
             isArray: true,
             params: {
-                controller: 'search'
+                id: 'basic'
             }
         },
         get: {
             method: 'GET',
+        },
+        getBasicInfo: {
+            method: 'GET',
+            params: {
+                controller: 'basic'
+            }
         },
         create: {
             method: 'POST'

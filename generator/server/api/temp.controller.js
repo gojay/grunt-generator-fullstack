@@ -78,7 +78,7 @@ exports.index = function(req, res) {
 
   Q.all([
     <%= className %>.count(query.where).exec(),
-    <%= className %>.find(query.where).sort(query.sort).skip(skip).limit(limit).exec()
+    <% if(referer && referer.modelPopulate) { %><%=referer.modelPopulate %> <% } else { %><%= className %>.find(query.where).sort(query.sort).skip(skip).limit(limit).exec() <% } %>
   ])
   .spread(function (total, <%= name %>s) {
     res.set('X-Pagination-Total-Count', total);
@@ -89,7 +89,7 @@ exports.index = function(req, res) {
 
 // Gets a single <%= className %> from the DB
 exports.show = function(req, res) {
-  <%= className %>.findById(req.params.id).exec()
+<% if(referer) { %> <%= className %>.findById(req.params.id).populate({ path: '<%= referer.className %>', select: '<%= referer.fields.toString().replace(/\,/g, ' ') %>' }).exec() <% } else { %> <%= className %>.findById(req.params.id).exec() <% } %>
     .then(handleEntityNotFound(res))
     .then(responseWithResult(res))
     .then(null, handleError(res));
@@ -122,9 +122,40 @@ exports.destroy = function(req, res) {
     .then(null, handleError(res));
 };
 
-exports.search = function(req, res) {
-  var filter = req.body.q ? { name: new RegExp(req.body.q, 'i') } : {} ;
+/**
+ * /api/<%= name %>/basic
+ * @param  {String} req.query.q 
+ * @param  {String} req.query.fields field1|field2|field3 
+ *
+ * @example
+ *  /api/<%= name %>/basic?q=lorem&fields=field1|field2|field3
+ */
+exports.basic = function(req, res) {
+  var q = req.query.q, fields = req.query.fields;
+  var filter = {};
+
+  if(fields) {
+    var or = fields.split('|').map(function (field) {
+      var obj = {};
+      obj[field] = new RegExp(q, 'i');
+      return obj;
+    });
+    filter = { $or: or };
+  } else {
+    <% if(referer) { %>
+    filter = q ? { <%= referer.fields[0] %>: new RegExp(q, 'i') } : {} ;
+    <% } else { %>
+    filter = q ? { name: new RegExp(q, 'i') } : {} ;
+    <% } %>
+  }
   <%= className %>.find(filter).exec()
+    .then(responseWithResult(res))
+    .then(null, handleError(res));
+};
+
+exports.basicInfo = function(req, res) {
+<% if(referer) { %> <%= className %>.findById(req.params.id).populate({ path: '<%= referer.className %>', select: '<%= referer.fields.toString().replace(/\,/g, ' ') %>' }).exec() <% } else { %> <%= className %>.findById(req.params.id).exec() <% } %>
+    .then(handleEntityNotFound(res))
     .then(responseWithResult(res))
     .then(null, handleError(res));
 };

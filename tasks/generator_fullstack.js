@@ -64,15 +64,15 @@ Generator.prototype.buildFields = function (dest, files) {
           switch(type) {
             case 'number':
               obj['input'] = 'number';
-              // obj.test.post = [obj.name, 10];
-              // obj.test.put = [obj.name, 20];
+              obj.test.post = [obj.name, 10, 'number'];
+              obj.test.put = [obj.name, 20, 'number'];
               break;
             case 'date':
               obj['input'] = 'date';
-              // obj.test.post = [obj.name, new Date()];
+              obj.test.post = [obj.name, "new Date()", 'date'];
               // var tomorrow = new Date();
               // tomorrow.setDate(tomorrow.getDate() + 1);
-              // obj.test.put = [obj.name, tomorrow];
+              obj.test.put = [obj.name, "new Date(Date.now()+24*60*60*1000)", 'date'];
               break;
             case 'boolean':
               obj['input'] = 'radio';
@@ -83,16 +83,16 @@ Generator.prototype.buildFields = function (dest, files) {
                 title: 'No',
                 value: false
               }];
-              // obj.test.post = [obj.name, true];
-              // obj.test.put = [obj.name, false];
+              obj.test.post = [obj.name, true, 'boolean'];
+              obj.test.put = [obj.name, false, 'boolean'];
               break;
             default:
             case 'string':
               if(!obj.hasOwnProperty('input')) {
                 obj['input'] = 'text';
               }
-              // obj.test.post = [obj.name, 'new '+ obj.name];
-              // obj.test.put = [obj.name, 'updated '+ obj.name];
+              obj.test.post = [obj.name, '"new '+ obj.name + '"', 'string'];
+              obj.test.put = [obj.name, 'updated '+ obj.name + '"',, 'string'];
               break;
           }
           break;
@@ -124,8 +124,24 @@ Generator.prototype.buildFields = function (dest, files) {
 
       obj.schemaType = JSON.stringify(obj.model).replace(/\"([^(\")"]+)\":/g,"$1:");
       return obj;
-    }, { model: {}/*, test: { post: [], put: [] }*/ });
+    }, { model: {}, test: { post: [], put: [] } });
   });
+
+  if(this.options.referer) {
+    // var schemaType = { type: 'Schema.Types.ObjectId', ref: ''+this.options.referer.className+'', required: true };
+    fields.push({
+      name: this.options.referer.name,
+      title: this.options.referer.className,
+      getReferer: 'get' + this.options.referer.className,
+      schemaType: '{ type:Schema.Types.ObjectId, ref:"'+this.options.referer.className+'", required:true }',
+      input: 'typeahead',
+      required: true,
+      key: this.options.referer.fields[0],
+      test: { post: [], put: [] }
+    });
+
+    this.options.referer.modelPopulate = this.options.className + '.find(query.where).populate({ path: \''+ this.options.referer.className +'\', select: \''+ this.options.referer.fields.toString().replace(/\,/g, ' ') +'\' }).sort(query.sort).skip(skip).limit(limit)';
+  }
   return fields;
 };
 Generator.prototype.buildFiles = function (dest, files) {
@@ -160,13 +176,35 @@ module.exports = function(grunt) {
     
     // default, jade template
     var options = this.options({
+      referer: null,
       unprefixDest: [],
-      jade: grunt.option('html') === true ? false : true,
-      skip: []
+      skipDest: [],
+      jade: grunt.option('html') === true ? false : true
     });
 
+    var link = grunt.option('link');
+    if(link) {
+      var referer = {};
+      referer.fields = link.split(':') || [];
+      referer.name = referer.fields.shift();
+      referer.className = _.capitalize(_.camelCase(referer.name));
+      if(_.isEmpty(referer.fields)) {
+        referer.fields = ['name'];
+      }
+      // grunt.log.writeln('referer', referer);
+
+      var serverExist = grunt.file.exists('server/api/'+ referer.name);
+      var clientExist = grunt.file.exists('client/components/'+ referer.name);
+      // if(!serverExist && !clientExist) {
+      //   grunt.log.warn('link '+ referer.className +' not found!');
+      //   return false;
+      // }
+
+      options.referer = referer;
+    }
+
     var g = new Generator(options);
-    // grunt.log.writeln('options', JSON.stringify(g.options, null, 2));
+    grunt.log.writeln('options', JSON.stringify(g.options, null, 2));
 
     if(g.errors.length) {
       g.errors.forEach(function (e) {
@@ -217,7 +255,7 @@ module.exports = function(grunt) {
       })
       // filter is file
       .filter(function(filepath) {
-        return grunt.file.isFile(filepath) && options.skip.indexOf(f.dest) == -1;
+        return options.skipDest.indexOf(f.dest) == -1 && grunt.file.isFile(filepath);
       })
       // filter jade/html
       .filter(function(filepath) {
@@ -226,12 +264,10 @@ module.exports = function(grunt) {
         return regexExt.test(filepath);
       });
 
-      // console.log(f.dest, JSON.stringify(src, null, 2));
-
       if (!src.length) {
         grunt.log.warn(
           'Destination `' + f.dest +
-          '` not written because `src` files were empty or skipped.'
+          '` not written because `src` files were empty.'
         );
       }
 

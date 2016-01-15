@@ -3,9 +3,9 @@
 angular.module('<%= moduleName %>')
 	.controller('<%= className %>FormCtrl', <%= className %>FormCtrl);
 
-<%= className %>FormCtrl.$inject = ['$scope', '$state', '$log', '<%= name %>'];
+<%= className %>FormCtrl.$inject = ['$scope', '$state', '$log', '<%= name %>'<%= referer ? ', \''+ referer.className +'\'' : '' %>];
 
-function <%= className %>FormCtrl ($scope, $state, $log, <%= name %>) {
+function <%= className %>FormCtrl ($scope, $state, $log, <%= name %><%= referer ? ', '+ referer.className : '' %>) {
 	var vm = this;
 	vm.loading = false;
 	vm.model = <%= name %>;
@@ -27,7 +27,8 @@ function <%= className %>FormCtrl ($scope, $state, $log, <%= name %>) {
 	/* select options */
 
 	vm.options = <%= JSON.stringify(selectOptions, null, 4) %>;
-<% } %><% if(hasDate) { %> 
+<% } %>
+<% if(hasDate) { %> 
 	/* datepicker */
 
 	vm.opened = false;
@@ -47,6 +48,17 @@ function <%= className %>FormCtrl ($scope, $state, $log, <%= name %>) {
 	  	disabled: function(date, mode) {
 		    return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
 	  	}
+	};
+<% } %>
+<% if(referer) { %>
+	/* link to <%= referer.className %> */
+
+	vm.get<%= referer.className %> = function(q) {
+		return <%= referer.className %>.getBasic({ q: q }).$promise.then(function (data) {
+			return data;
+		}).catch(function (err) {
+			$log.error('Error:link:<%= referer.className %>', err);
+		});
 	};
 <% } %>
 	/* save */
