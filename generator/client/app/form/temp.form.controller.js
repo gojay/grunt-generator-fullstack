@@ -41,9 +41,9 @@ function <%= className %>FormCtrl ($scope, $state, $log, <%= name %><%= referer 
 	  	},
 	  	opened: false,
 	  	open: function(event) {
-			event.preventDefault();
-	      	event.stopPropagation();
-			vm.datepicker.opened = true;
+				event.preventDefault();
+	      event.stopPropagation();
+				vm.datepicker.opened = true;
 	  	},
 	  	disabled: function(date, mode) {
 		    return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
@@ -54,7 +54,7 @@ function <%= className %>FormCtrl ($scope, $state, $log, <%= name %><%= referer 
 	/* link to <%= referer.className %> */
 
 	vm.get<%= referer.className %> = function(q) {
-		return <%= referer.className %>.getBasic({ q: q }).$promise.then(function (data) {
+		return <%= referer.className %>.getBasic({ q: q, fields: '<%= referer.fields.toString() %>' }).$promise.then(function (data) {
 			return data;
 		}).catch(function (err) {
 			$log.error('Error:link:<%= referer.className %>', err);
@@ -67,12 +67,14 @@ function <%= className %>FormCtrl ($scope, $state, $log, <%= name %><%= referer 
 		vm.submitted = true;
 		if( form.$valid ) {
 			vm.loading = true;
-			vm.model.$save().then(function success(data) {
-				vm.loading = vm.submitted = false;
+			vm.model.$save().then(function (data) {
+				vm.submitted = false;
 				$state.go('^.index');
 				$log.info('Saved successfuly', '<%= className %>');
-			}, function error(data) {
-				$log.error('Fail added <%= name %>!', '<%= className %>');
+			}).catch(function (error) {
+				$log.error('Error save <%= name %>!', '<%= className %>', error);
+			}).finally(function() {
+				vm.loading = false;
 			});
 		} 
 	}

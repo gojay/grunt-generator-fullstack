@@ -5,7 +5,7 @@
         <tr class="align-center">
 <% if(fields) { _.forEach(fields, function(field) { %>
           <td data-title="'<%= field.title %>'">
-            <strong ng-bind="model.<%= field.name %><%= (field.type == 'Date') ? ' | amDateFormat:\'MM/DD/YYYY\'' : '' %>"></strong>
+            <strong ng-bind="model.<%= field.nameRef || field.name %><%= (field.type == 'Date') ? ' | amDateFormat:\'MM/DD/YYYY\'' : '' %>"></strong>
           </td>
 <% }) } else { %>
           <td data-title="'<%= className %>'">

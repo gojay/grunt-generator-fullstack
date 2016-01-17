@@ -24,21 +24,22 @@ function Generator(options) {
   this.options.name = options.args.shift();
   this.options.className = _.capitalize(_.camelCase(this.options.name));
   this.options.path = 'app/'+ this.options.name;
-  // build fields
-  this.options.fields = this.buildFields();
+  // build fields & tests
+  _.extend(this.options, this.buildData());
   var dateField = _.find(this.options.fields, 'type', 'Date');
   this.options.hasDate = dateField ? dateField.name : null ;
   var selectField = _.find(this.options.fields, 'input', 'select');
   this.options.selectOptions = selectField ? selectField.options : [] ;
-};
+}
 
-Generator.prototype.buildFields = function (dest, files) {
+Generator.prototype.buildData = function (dest, files) {
   var self = this;
+  var tests = { post: [], put: [] };
   var fields = this.options.args.filter(function (field) {
     if(/type=select/.test(field) && !/options/.test(field)) {
       self.errors.push({
         str: field,
-        message: 'options (separated by \'/\') required for SELECT!'
+        message: 'options required (separated by \'/\') for SELECT!'
       });
       return false;
     }
@@ -64,15 +65,13 @@ Generator.prototype.buildFields = function (dest, files) {
           switch(type) {
             case 'number':
               obj['input'] = 'number';
-              obj.test.post = [obj.name, 10, 'number'];
-              obj.test.put = [obj.name, 20, 'number'];
+              tests.post.push({ key: obj.name, value: 10, expect: 10, type: 'Number' });
+              tests.put.push({ key: obj.name, value: 20, expect: 20, type: 'Number' });
               break;
             case 'date':
               obj['input'] = 'date';
-              obj.test.post = [obj.name, "new Date()", 'date'];
-              // var tomorrow = new Date();
-              // tomorrow.setDate(tomorrow.getDate() + 1);
-              obj.test.put = [obj.name, "new Date(Date.now()+24*60*60*1000)", 'date'];
+              tests.post.push({ key: obj.name, value: 'newDate', expect: 'newDate', type: 'Date' });
+              tests.put.push({ key: obj.name, value: 'updateDate',expect: 'updateDate', type: 'Date' });
               break;
             case 'boolean':
               obj['input'] = 'radio';
@@ -83,16 +82,15 @@ Generator.prototype.buildFields = function (dest, files) {
                 title: 'No',
                 value: false
               }];
-              obj.test.post = [obj.name, true, 'boolean'];
-              obj.test.put = [obj.name, false, 'boolean'];
+              tests.post.push({ key: obj.name, value: true, expect: true, type: 'Boolean' });
+              tests.put.push({ key: obj.name, value: false, expect: false, type: 'Boolean' });
               break;
-            default:
             case 'string':
               if(!obj.hasOwnProperty('input')) {
                 obj['input'] = 'text';
-              }
-              obj.test.post = [obj.name, '"new '+ obj.name + '"', 'string'];
-              obj.test.put = [obj.name, 'updated '+ obj.name + '"',, 'string'];
+              } 
+              tests.post.push({ key: obj.name, value: '"new '+ obj.name + '"', expect: '"new '+ obj.name + '"',  type: 'String' });
+              tests.put.push({ key: obj.name, value: '"updated '+ obj.name + '"', expect: '"updated '+ obj.name + '"', type: 'String' });
               break;
           }
           break;
@@ -102,8 +100,10 @@ Generator.prototype.buildFields = function (dest, files) {
             return {
               title: _.startCase(v),
               value: v
-            }
+            };
           });
+          tests.post.push({ key: obj.name, value: '"'+ _.first(obj.model.enum) + '"', expect: '"'+ _.first(obj.model.enum) + '"', type: 'String' });
+          tests.put.push({ key: obj.name, value: '"'+ _.last(obj.model.enum) + '"', expect: '"'+ _.last(obj.model.enum) + '"', type: 'String' });
           break;
         default:
           obj[key] = value;
@@ -114,35 +114,48 @@ Generator.prototype.buildFields = function (dest, files) {
         obj.model['required'] = true;
       }
       if(obj.default) {
-        if(obj.default === 'true') 
+        if(obj.default === 'true') {
           obj.default = true;
-        else if(obj.default === 'false') 
+        }
+        else if(obj.default === 'false') {
           obj.default = false;
+        }
 
         obj.model['default'] = obj.default;
       }
 
       obj.schemaType = JSON.stringify(obj.model).replace(/\"([^(\")"]+)\":/g,"$1:");
       return obj;
-    }, { model: {}, test: { post: [], put: [] } });
+    }, { model: {} });
   });
 
   if(this.options.referer) {
-    // var schemaType = { type: 'Schema.Types.ObjectId', ref: ''+this.options.referer.className+'', required: true };
-    fields.push({
+    var key = this.options.referer.fields[0];
+    var refObj = {
+      model: { type: 'ObjectId' },
       name: this.options.referer.name,
+      nameRef: this.options.referer.name + '.' + key,
       title: this.options.referer.className,
       getReferer: 'get' + this.options.referer.className,
       schemaType: '{ type:Schema.Types.ObjectId, ref:"'+this.options.referer.className+'", required:true }',
       input: 'typeahead',
       required: true,
-      key: this.options.referer.fields[0],
-      test: { post: [], put: [] }
-    });
-
-    this.options.referer.modelPopulate = this.options.className + '.find(query.where).populate({ path: \''+ this.options.referer.className +'\', select: \''+ this.options.referer.fields.toString().replace(/\,/g, ' ') +'\' }).sort(query.sort).skip(skip).limit(limit)';
+      key: key
+    };
+    fields.push(refObj);
+    tests.post.push({ key: refObj.name, value: 'newObjectId', expect: 'newObjectId', type: 'ObjectId' });
+    tests.put.push({ key: refObj.name, value: 'updateObjectId', expect: 'updateObjectId', type: 'ObjectId' });
   }
-  return fields;
+  tests.fieldsArr = _.pluck(fields, 'name');
+  tests.fieldsObj = _.map(fields, function (item) {
+    var obj = item.model;
+    obj.name = item.name;
+    if(obj.enum) {
+      obj.value = obj.enum[0];
+    }
+    return obj;
+  });
+  return { fields: fields, tests: tests };
 };
 Generator.prototype.buildFiles = function (dest, files) {
   var prefix = 'generator/'+ dest;
@@ -185,7 +198,7 @@ module.exports = function(grunt) {
     var link = grunt.option('link');
     if(link) {
       var referer = {};
-      referer.fields = link.split(':') || [];
+      referer.fields = link.split(/[\:|\,]/g) || [];
       referer.name = referer.fields.shift();
       referer.className = _.capitalize(_.camelCase(referer.name));
       if(_.isEmpty(referer.fields)) {
@@ -277,7 +290,7 @@ module.exports = function(grunt) {
         var template = grunt.file.read(src);
         var result = grunt.template.process(template, { data: g.options });
         // Write the destination file
-        grunt.file.write(dest, result);
+        // grunt.file.write(dest, result);
         // Print a success message
         grunt.log.writeln('File `' + dest + '` created.');
       });

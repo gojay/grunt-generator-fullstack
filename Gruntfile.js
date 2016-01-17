@@ -35,7 +35,7 @@ module.exports = function(grunt) {
     generator_fullstack: {
       default: {
         options: {
-          moduleName: 'testApp',
+          moduleName: 'materialApp',
           // routes: {
           //   file: 'server/routes.js',
           //   pattern: '// Insert routes below'
@@ -81,6 +81,8 @@ module.exports = function(grunt) {
    * grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=description,input=textarea:name=date,type=date:name=active,type=boolean,default=true:name=direction,type=select,input=select,options=up/bottom/right/left --html
    * grunt generator:example:name=name,required=true:name=price,type=number,required=true:name=date,type=date:name=active,type=boolean,default=true:name=direction,type=select,input=select,required=true,options=up/bottom/right/left:name=description,input=textarea --html
    *
+   * grunt generator:referrer:name=name,required=true:name=price,type=number,required=true:name=date,type=date:name=active,type=boolean,default=true:name=direction,type=select,input=select,required=true,options=up/bottom/right/left:name=description,input=textarea --link=example:name,description --html
+   * 
    * or
    * 
     grunt generator:example\
@@ -89,7 +91,7 @@ module.exports = function(grunt) {
     :name=description,input=textarea\
     :name=date,type=date\
     :name=active,type=boolean,default=true\
-    :name=direction,type=select,input=select,options=up/bottom/right/left
+    :name=direction,input=select,options=up/bottom/right/left
    *
    */
   grunt.registerTask('generator', function (target, options) {
@@ -100,7 +102,7 @@ module.exports = function(grunt) {
         default: {
           options: { 
             args: args,
-            skipDest: ['server/components']
+            // skipDest: ['server/components']
           }
         }
       }

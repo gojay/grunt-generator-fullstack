@@ -41,12 +41,13 @@ function <%= className %>Ctrl($scope, $state, ngTableParams, Modal, <%= classNam
     function getData($defer, params) {
         vm.loading = true;
         var query = utils.patchListParams(params);
-        <%= className %>.query(query, function(<%= name %>s, headers) {
+        <%= className %>.query(query, function success(<%= name %>s, headers) {
             $defer.resolve(<%= name %>s);
             vm.table.total(headers('X-Pagination-Total-Count'));
-            vm.loading = true;
-        }, function(err) {
+        }, function error(err) {
             $log.error('Error occured!', 'Load <%= name %>s', err);
+        })
+        .$promise.finally(function() {
             vm.loading = true;
         });
     }

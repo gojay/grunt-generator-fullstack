@@ -23,7 +23,12 @@
           <div class="btn-group"><% _.forEach(field.options, function(option) { %>
             <label class="btn btn-info" ng-model="vm.model.<%= field.name %>" btn-radio="<%= option.value %>" uncheckable><%= option.title %></label><% }) %>
           </div>
-          <input type="hidden" name="<%= field.name %>" ng-model="vm.model.<%= field.name %>"<%= field.required === 'true' ? ' required': '' %> /><% } else { %>
+          <input type="hidden" name="<%= field.name %>" ng-model="vm.model.<%= field.name %>"<%= field.required === 'true' ? ' required': '' %> /><% } else if(field.input == 'typeahead') { %>
+          <input class="form-control" type="text", name="<%= field.name %>" ng-model="vm.model.<%= field.name %>" typeahead="value as value.<%= field.key %> for value in vm.<%= field.getReferer %>($viewValue)" typeahead-loading="vm.loadingTypeahed" typeahead-no-results="vm.noResults" autocomplete="off" required>
+          <i class="glyphicon glyphicon-refresh" ng-show="vm.loadingTypeahed"></i>
+          <div ng-show="vm.noResults"> 
+            <i class="glyphicon glyphicon-remove"></i> No Results Found
+          </div><% } else { %>
           <input type="<%= field.input %>" name="<%= field.name %>" class="form-control" autocomplete="off" ng-model="vm.model.<%= field.name %>"<%= field.required === 'true' ? ' required': '' %> /><% } %>
         </div>
         <div class="col-md-9 col-md-push-3" 

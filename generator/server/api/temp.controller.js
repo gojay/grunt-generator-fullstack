@@ -78,7 +78,7 @@ exports.index = function(req, res) {
 
   Q.all([
     <%= className %>.count(query.where).exec(),
-    <% if(referer && referer.modelPopulate) { %><%=referer.modelPopulate %> <% } else { %><%= className %>.find(query.where).sort(query.sort).skip(skip).limit(limit).exec() <% } %>
+    <%= className %>.find(query.where)<%= referer ? '.populate({ path: \''+ referer.name +'\', select: \''+ referer.fields.toString().replace(/\,/g, ' ') +'\' })' : '' %>.sort(query.sort).skip(skip).limit(limit).exec() 
   ])
   .spread(function (total, <%= name %>s) {
     res.set('X-Pagination-Total-Count', total);
@@ -89,7 +89,7 @@ exports.index = function(req, res) {
 
 // Gets a single <%= className %> from the DB
 exports.show = function(req, res) {
-<% if(referer) { %> <%= className %>.findById(req.params.id).populate({ path: '<%= referer.className %>', select: '<%= referer.fields.toString().replace(/\,/g, ' ') %>' }).exec() <% } else { %> <%= className %>.findById(req.params.id).exec() <% } %>
+<% if(referer) { %> <%= className %>.findById(req.params.id).populate({ path: '<%= referer.name %>', select: '<%= referer.fields.toString().replace(/\,/g, ' ') %>' }).exec() <% } else { %> <%= className %>.findById(req.params.id).exec() <% } %>
     .then(handleEntityNotFound(res))
     .then(responseWithResult(res))
     .then(null, handleError(res));
@@ -97,6 +97,11 @@ exports.show = function(req, res) {
 
 // Creates a new <%= className %> in the DB
 exports.create = function(req, res) {
+  <% if(referer) { %>
+  if(req.body.<%= referer.name %>._id) {
+    req.body.<%= referer.name %> = req.body.<%= referer.name %>._id;
+  }
+  <% } %>
   <%= className %>.create(req.body)
     .then(responseWithResult(res, 201))
     .then(null, handleError(res));
@@ -107,6 +112,11 @@ exports.update = function(req, res) {
   if (req.body._id) {
     delete req.body._id;
   }
+  <% if(referer) { %>
+  if(req.body.<%= referer.name %>._id) {
+    req.body.<%= referer.name %> = req.body.<%= referer.name %>._id;
+  }
+  <% } %>
   <%= className %>.findById(req.params.id).exec()
     .then(handleEntityNotFound(res))
     .then(saveUpdates(req.body))
@@ -131,11 +141,13 @@ exports.destroy = function(req, res) {
  *  /api/<%= name %>/basic?q=lorem&fields=field1|field2|field3
  */
 exports.basic = function(req, res) {
-  var q = req.query.q, fields = req.query.fields;
+  var q = req.query.q;
+  var match = req.query.match,
+      fields = req.query.fields;
   var filter = {};
 
   if(fields) {
-    var or = fields.split('|').map(function (field) {
+    var or = (match || fields).split('|').map(function (field) {
       var obj = {};
       obj[field] = new RegExp(q, 'i');
       return obj;
